@@ -2,7 +2,17 @@ package fr.iiil.rodez.sokoban;
 
 import fr.iiil.rodez.sokoban.model.Level;
 
+/**
+ * Classe utilitaire de création de niveau Sokoban
+ * @author Axel Lormeau
+ * @author Xavier Mourgues
+ *
+ */
 public class LevelEditor {
+	/**
+	 * Création d'un level facile à accomplir pour des cas de test
+	 * @return Le niveau crée
+	 */
 	public static Level createEasyTestLevel(){
 		Level level = new Level(3, 3);
 		
@@ -12,6 +22,10 @@ public class LevelEditor {
 		return level;
 	}
 	
+	/**
+	 * Céation du niveau 1 du jeu Sokoban
+	 * @return Le niveau crée
+	 */
 	public static Level createLevel1(){		
 		Level level = new Level(12, 12, 5, 1);
 
