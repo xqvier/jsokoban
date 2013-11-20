@@ -9,8 +9,8 @@ public class Level {
 
 	public Level(int pWidth, int pHeight, int pCharacterPosX, int pCharacterPosY) {
 		super();
-		if (pWidth <= 0 || pHeight <= 0 || pCharacterPosX <= 0
-				|| pCharacterPosX >= pWidth || pCharacterPosY <= 0
+		if (pWidth <= 0 || pHeight <= 0 || pCharacterPosX < 0
+				|| pCharacterPosX >= pWidth || pCharacterPosY < 0
 				|| pCharacterPosX >= pHeight) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
@@ -27,6 +27,10 @@ public class Level {
 
 	public Level() {
 		this(20, 20, 0, 0);
+	}
+
+	public Case[][] getCases() {
+		return cases;
 	}
 
 	private void initializeEmptiness() {
@@ -254,7 +258,7 @@ public class Level {
 				|| cases[characterPosX - 1][characterPosY].getType().equals(
 						CaseType.FILLED_HOLE)) {
 			try {
-				checkBoundaries(characterPosX + 2, characterPosY);
+				checkBoundaries(characterPosX - 2, characterPosY);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				return false;
 			}
@@ -332,8 +336,17 @@ public class Level {
 		return true;
 	}
 
-	public Case[][] getCases() {
-		return cases;		
+	public boolean checkVictory() {
+		for (int i = 0; i < cases.length; i++) {
+			for (int j = 0; j < cases[0].length; j++) {
+				if (cases[i][j].getType().equals(CaseType.HOLE)
+						|| cases[i][j].getType().equals(
+								CaseType.CHARACTER_ON_HOLE)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 }

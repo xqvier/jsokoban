@@ -11,8 +11,8 @@ public class Jsokoban {
 	public static void main(String[] args) {
 		// Initialisation des level
 		Level level = LevelEditor.createLevel1();
-		
-		
+		//Level level = LevelEditor.createEasyTestLevel(); 
+
 		// Fenetre
 		JFrame fenetre = new JFrame();
 		fenetre.setTitle("Sokoban");
@@ -20,13 +20,14 @@ public class Jsokoban {
 		fenetre.setSize(800, 600);
 		JPanel contentPane = new JPanel();
 		fenetre.add(contentPane);
-				
-		LevelUI levelUI = new LevelUI(level);
+		fenetre.setVisible(true);
+
+		LevelUI levelUI = new LevelUI(level, contentPane.getWidth(), contentPane.getHeight());
+		fenetre.addKeyListener(levelUI);
+
 		contentPane.add(levelUI);
-		
-		
-		fenetre.setVisible(true);		
-		
+
+
 	}
 
 }
