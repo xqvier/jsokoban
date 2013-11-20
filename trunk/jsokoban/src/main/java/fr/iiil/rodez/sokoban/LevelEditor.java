@@ -3,6 +3,15 @@ package fr.iiil.rodez.sokoban;
 import fr.iiil.rodez.sokoban.model.Level;
 
 public class LevelEditor {
+	public static Level createEasyTestLevel(){
+		Level level = new Level(3, 3);
+		
+		level.addStone(1, 0);
+		level.addHole(2, 0);
+		
+		return level;
+	}
+	
 	public static Level createLevel1(){		
 		Level level = new Level(12, 12, 5, 1);
 
@@ -24,8 +33,10 @@ public class LevelEditor {
 		level.addWall(0, 2);
 		level.addWall(1, 2);
 		level.addWall(2, 2);
-		level.addWall(6, 2);
+		level.addWall(3, 2);
 		level.addWall(7, 2);
+		level.addWall(8, 2);
+		level.addWall(11, 2);
 		level.addWall(3,3);
 		level.addWall(5,3);
 		level.addWall(7,3);
