@@ -1,8 +1,6 @@
 package fr.iiil.rodez.sokoban.model;
 
 import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +15,30 @@ import javax.imageio.stream.FileImageInputStream;
  * 
  */
 public class Case {
+    private static BufferedImage CHARACTER_IMAGE;
+    private static BufferedImage HOLE_IMAGE;
+    private static BufferedImage STONE_IMAGE;
+    private static BufferedImage WALL_IMAGE;
+    private static BufferedImage EMPTY_IMAGE;
+
+    static {
+        try {
+            CHARACTER_IMAGE = ImageIO.read(new FileImageInputStream(new File(
+                    Case.class.getResource("/mario.jpg").getFile())));
+            HOLE_IMAGE = ImageIO.read(new FileImageInputStream(new File(
+                    Case.class.getResource("/hole.jpg").getFile())));
+            WALL_IMAGE = ImageIO.read(new FileImageInputStream(new File(
+                    Case.class.getResource("/wall.jpg").getFile())));
+            EMPTY_IMAGE = ImageIO.read(new FileImageInputStream(new File(
+                    Case.class.getResource("/empty.jpg").getFile())));
+            STONE_IMAGE = ImageIO.read(new FileImageInputStream(new File(
+                    Case.class.getResource("/stone.jpg").getFile())));            
+
+        } catch (IOException e) {
+            throw new RuntimeException("Image non trouvé", e);
+        }
+
+    }
     /** Le type de la case */
     private CaseType type;
 
@@ -63,56 +85,33 @@ public class Case {
     public void paint(Graphics2D contexte, int pPosX, int pPosY, int pWidth,
             int pHeight) {
         // TODO faire un meilleur graphisme
+        BufferedImage img = null;
         switch (type) {
         case CHARACTER:
-            BufferedImage img = new BufferedImage(pWidth, pHeight,
-                    BufferedImage.TYPE_INT_RGB);
-            try {
-                img = ImageIO.read(new FileImageInputStream(new File(getClass().getResource("/mario.jpg").getFile())));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            // FIXME position !
-            contexte.drawImage(img, pPosX, pPosY, pPosX + pWidth, pPosY
-                    + pHeight, pPosX, pPosY, pPosX + pWidth, pPosY + pHeight,
-                    null);
-
-            // contexte.draw(new Ellipse2D.Double(pPosX * pWidth, pPosY *
-            // pHeight,
-            // pWidth, pHeight));
-            break;
+            /* fall-through */
         case CHARACTER_ON_HOLE:
-            contexte.draw(new Ellipse2D.Double(pPosX * pWidth, pPosY * pHeight,
-                    pWidth, pHeight));
-            contexte.draw(new Ellipse2D.Double(pPosX * pWidth + pWidth / 4,
-                    pPosY * pHeight + pHeight / 4, pWidth / 2, pHeight / 2));
-
+            img = CHARACTER_IMAGE;
             break;
         case HOLE:
-            contexte.draw(new Ellipse2D.Double(pPosX * pWidth + pWidth / 4,
-                    pPosY * pHeight + pHeight / 4, pWidth / 2, pHeight / 2));
-
+            img = HOLE_IMAGE;
             break;
         case FILLED_HOLE:
-            contexte.draw(new Rectangle2D.Double(pPosX * pWidth + pWidth / 4,
-                    pPosY * pHeight + pHeight / 4, pWidth / 2, pHeight / 2));
-            contexte.draw(new Ellipse2D.Double(pPosX * pWidth + pWidth / 4,
-                    pPosY * pHeight + pHeight / 4, pWidth / 2, pHeight / 2));
-
-            break;
+            /* fail-through */
         case STONE:
-            contexte.draw(new Rectangle2D.Double(pPosX * pWidth + pWidth / 4,
-                    pPosY * pHeight + pHeight / 4, pWidth / 2, pHeight / 2));
-
+            img = STONE_IMAGE;
             break;
         case WALL:
-            contexte.draw(new Rectangle2D.Double(pPosX * pWidth, pPosY
-                    * pHeight, pWidth, pHeight));
+            img = WALL_IMAGE;
             break;
-
+        case EMPTY:
+            img = EMPTY_IMAGE;
+            break;
         default:
             break;
         }
+
+        contexte.drawImage(img, pPosX * pWidth, pPosY * pHeight, pPosX * pWidth
+                + pWidth, pPosY * pHeight + pHeight, 0, 0, img.getWidth(),
+                img.getHeight(), null);
     }
 }

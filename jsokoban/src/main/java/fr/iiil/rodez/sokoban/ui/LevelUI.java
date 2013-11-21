@@ -36,9 +36,13 @@ public class LevelUI extends JPanel implements KeyListener {
 
     /**
      * Constructeur de création du l'UI du niveau
-     * @param pLevel Le niveau à dessiner
-     * @param pWidth La largeur en pixel de l'UI
-     * @param pHeight La hauteur en pixel de l'UI
+     * 
+     * @param pLevel
+     *            Le niveau à dessiner
+     * @param pWidth
+     *            La largeur en pixel de l'UI
+     * @param pHeight
+     *            La hauteur en pixel de l'UI
      */
     public LevelUI(Level pLevel, int pWidth, int pHeight) {
         level = pLevel;
@@ -48,24 +52,24 @@ public class LevelUI extends JPanel implements KeyListener {
         this.setBackground(Color.RED);
     }
 
-
     /**
-     * @param level the level to set
+     * @param level
+     *            the level to set
      */
     public void setLevel(Level level) {
         this.level = level;
     }
 
-
     @Override
     public void paint(Graphics g) {
-        g.clearRect(0, 0, width, height);
+        g.clearRect(0, 0, getParent().getParent().getWidth(), getParent().getParent().getHeight());
         Case[][] cases = level.getCases();
         Graphics2D g2D = (Graphics2D) g;
         for (int i = 0; i < cases[0].length; i++) {
             for (int j = 0; j < cases[0].length; j++) {
-                cases[i][j].paint(g2D, i, j, width / level.getCases().length,
-                        height / level.getCases()[0].length);
+                cases[i][j].paint(g2D, i, j, getWidth()
+                        / level.getCases().length,
+                        getHeight() / level.getCases()[0].length);
             }
         }
     }
