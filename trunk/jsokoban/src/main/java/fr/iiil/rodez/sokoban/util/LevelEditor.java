@@ -1,4 +1,4 @@
-package fr.iiil.rodez.sokoban;
+package fr.iiil.rodez.sokoban.util;
 
 import fr.iiil.rodez.sokoban.model.Level;
 
