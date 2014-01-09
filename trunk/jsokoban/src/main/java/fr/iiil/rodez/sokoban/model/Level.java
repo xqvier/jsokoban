@@ -291,24 +291,29 @@ public class Level {
      * @return true si le déplacement est possible, false sinon
      */
     private boolean checkMoveEast() {
+    	// Verification qu'on est dans les limites du tableau
         try {
             checkBoundaries(characterPosX + 1, characterPosY);
         } catch (ArrayIndexOutOfBoundsException e) {
             return false;
         }
+        // Vérification qu'il n'y ai pas de mur
         if (cases[characterPosX + 1][characterPosY].getType().equals(
                 CaseType.WALL)) {
             return false;
         }
+        // Existance pierre ?
         if (cases[characterPosX + 1][characterPosY].getType().equals(
                 CaseType.STONE)
                 || cases[characterPosX + 1][characterPosY].getType().equals(
                         CaseType.FILLED_HOLE)) {
+        	// On verifie qu'elle va pas etre en dehors du tableau
             try {
                 checkBoundaries(characterPosX + 2, characterPosY);
             } catch (ArrayIndexOutOfBoundsException e) {
                 return false;
             }
+            // On vérifie qu'il n'y ai pas une autre pierre ou un mur derriere.
             if (cases[characterPosX + 2][characterPosY].getType().equals(
                     CaseType.WALL)
                     || cases[characterPosX + 2][characterPosY].getType()
