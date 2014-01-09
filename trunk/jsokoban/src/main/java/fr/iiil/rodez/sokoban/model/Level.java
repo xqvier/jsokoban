@@ -9,7 +9,7 @@ package fr.iiil.rodez.sokoban.model;
  */
 public class Level {
     /** Matrice des cases du niveau */
-    private Case[][] cases;
+    private final Case[][] cases;
 
     /** Position abscisse du personnage dans le niveau */
     private int characterPosX;
@@ -72,6 +72,24 @@ public class Level {
     }
 
     /**
+     * TODO comment role
+     * 
+     * @return TODO
+     */
+    public int getWidthSize() {
+        return cases[0].length;
+    }
+
+    /**
+     * TODO comment role
+     * 
+     * @return TODO
+     */
+    public int getHeightSize() {
+        return cases.length;
+    }
+
+    /**
      * Initialise le niveau avec uniquement des cases vides.
      */
     private void initializeEmptiness() {
@@ -87,8 +105,10 @@ public class Level {
     /**
      * Vérifie que des coordonnées de cases soit dans le cadre du niveau.
      * 
-     * @param pPosX La position en abscisse
-     * @param pPosY La position en ordonné
+     * @param pPosX
+     *            La position en abscisse
+     * @param pPosY
+     *            La position en ordonné
      */
     private void checkBoundaries(int pPosX, int pPosY) {
         if (pPosX < 0 || pPosX >= cases.length || pPosY < 0
@@ -98,9 +118,40 @@ public class Level {
     }
 
     /**
+     * TODO comment role
+     * 
+     * @param pPosX
+     *            position en abscisse
+     * @param pPosY
+     *            position en ordonné
+     */
+    public void setCharacter(int pPosX, int pPosY) {
+        checkBoundaries(pPosX, pPosY);
+        characterPosX = pPosX;
+        characterPosY = pPosY;
+        cases[pPosX][pPosY].setType(CaseType.CHARACTER);
+    }
+
+    /**
+     * Méthode permettant de positionner une case vide aux coordonnées donnée
+     * 
+     * @param pPosX
+     *            position en abscisse
+     * @param pPosY
+     *            position en ordonné
+     */
+    public void addEmpty(int pPosX, int pPosY) {
+        checkBoundaries(pPosX, pPosY);
+        cases[pPosX][pPosY].setType(CaseType.EMPTY);
+    }
+
+    /**
      * Méthode permettant de positionner un mur aux coordonnées donnée
-     * @param pPosX position en abscisse
-     * @param pPosY position en ordonné
+     * 
+     * @param pPosX
+     *            position en abscisse
+     * @param pPosY
+     *            position en ordonné
      */
     public void addWall(int pPosX, int pPosY) {
         checkBoundaries(pPosX, pPosY);
@@ -109,8 +160,11 @@ public class Level {
 
     /**
      * Méthode permettant de positionner une pierre aux coordonnées donnée
-     * @param pPosX position en abscisse
-     * @param pPosY position en ordonné
+     * 
+     * @param pPosX
+     *            position en abscisse
+     * @param pPosY
+     *            position en ordonné
      */
     public void addStone(int pPosX, int pPosY) {
         checkBoundaries(pPosX, pPosY);
@@ -119,8 +173,11 @@ public class Level {
 
     /**
      * Méthode permettant de positionner un trou aux coordonnées donnée
-     * @param pPosX position en abscisse
-     * @param pPosY position en ordonné
+     * 
+     * @param pPosX
+     *            position en abscisse
+     * @param pPosY
+     *            position en ordonné
      */
     public void addHole(int pPosX, int pPosY) {
         checkBoundaries(pPosX, pPosY);
@@ -288,6 +345,7 @@ public class Level {
 
     /**
      * Gère les collisions pour savoir si le personnage peut bouger à droite
+     * 
      * @return true si le déplacement est possible, false sinon
      */
     private boolean checkMoveEast() {
@@ -328,6 +386,7 @@ public class Level {
 
     /**
      * Gère les collisions pour savoir si le personnage peut bouger à gauche
+     * 
      * @return true si le déplacement est possible, false sinon
      */
     private boolean checkMoveWest() {
@@ -363,6 +422,7 @@ public class Level {
 
     /**
      * Gère les collisions pour savoir si le personnage peut bouger en haut
+     * 
      * @return true si le déplacement est possible, false sinon
      */
     private boolean checkMoveSouth() {
@@ -398,6 +458,7 @@ public class Level {
 
     /**
      * Gère les collisions pour savoir si le personnage peut bouger en bas
+     * 
      * @return true si le déplacement est possible, false sinon
      */
     private boolean checkMoveNorth() {
@@ -433,6 +494,7 @@ public class Level {
 
     /**
      * Vérifie s'il reste un trou sans pierre.
+     * 
      * @return true si tous les trous sont recouvert, false sinon
      */
     public boolean checkVictory() {

@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import fr.iiil.rodez.sokoban.model.Level;
+import fr.iiil.rodez.sokoban.ui.LevelEditorUI;
 import fr.iiil.rodez.sokoban.ui.LevelUI;
 import fr.iiil.rodez.sokoban.util.LevelEditor;
 
@@ -33,7 +34,7 @@ public class Jsokoban {
         JFrame fenetre = new JFrame();
         fenetre.setTitle("Sokoban");
         fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
         fenetre.setSize(800, 600);
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
@@ -44,7 +45,12 @@ public class Jsokoban {
                 fenetre.getHeight());
         fenetre.addKeyListener(levelUI);
 
-        contentPane.add(levelUI);
+        LevelEditorUI levelEditorUI = new LevelEditorUI(fenetre.getWidth(),
+                fenetre.getHeight());
+
+        fenetre.addMouseListener(levelEditorUI);
+        // contentPane.add(levelUI);
+        contentPane.add(levelEditorUI);
 
     }
 
