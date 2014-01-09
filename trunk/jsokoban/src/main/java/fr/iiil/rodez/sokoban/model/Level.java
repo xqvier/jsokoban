@@ -159,6 +159,21 @@ public class Level {
     }
 
     /**
+     * Méthode permettant de positionner un trou sous une pierre aux coordonnées
+     * donnée
+     * 
+     * @param pPosX
+     *            position en abscisse
+     * @param pPosY
+     *            position en ordonné
+     */
+    public void addFilledHole(int pPosX, int pPosY) {
+        checkBoundaries(pPosX, pPosY);
+        cases[pPosX][pPosY].setType(CaseType.FILLED_HOLE);
+
+    }
+
+    /**
      * Méthode permettant de positionner une pierre aux coordonnées donnée
      * 
      * @param pPosX
@@ -349,7 +364,7 @@ public class Level {
      * @return true si le déplacement est possible, false sinon
      */
     private boolean checkMoveEast() {
-    	// Verification qu'on est dans les limites du tableau
+        // Verification qu'on est dans les limites du tableau
         try {
             checkBoundaries(characterPosX + 1, characterPosY);
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -365,7 +380,7 @@ public class Level {
                 CaseType.STONE)
                 || cases[characterPosX + 1][characterPosY].getType().equals(
                         CaseType.FILLED_HOLE)) {
-        	// On verifie qu'elle va pas etre en dehors du tableau
+            // On verifie qu'elle va pas etre en dehors du tableau
             try {
                 checkBoundaries(characterPosX + 2, characterPosY);
             } catch (ArrayIndexOutOfBoundsException e) {

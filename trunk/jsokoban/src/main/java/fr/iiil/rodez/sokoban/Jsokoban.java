@@ -1,14 +1,8 @@
 package fr.iiil.rodez.sokoban;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import fr.iiil.rodez.sokoban.model.Level;
-import fr.iiil.rodez.sokoban.ui.LevelEditorUI;
-import fr.iiil.rodez.sokoban.ui.LevelUI;
-import fr.iiil.rodez.sokoban.util.LevelEditor;
+import fr.iiil.rodez.sokoban.ui.FenetreUI;
 
 /**
  * Classe principale de lancement du jeu Sokoban
@@ -26,31 +20,11 @@ public class Jsokoban {
      *            liste des arguments passé au programme
      */
     public static void main(String[] args) {
-        // Initialisation des level
-        Level level = LevelEditor.createLevel1();
-        // Level level = LevelEditor.createEasyTestLevel();
 
         // Fenetre
-        JFrame fenetre = new JFrame();
-        fenetre.setTitle("Sokoban");
-        fenetre.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame fenetre = new FenetreUI();
 
-        fenetre.setSize(800, 600);
-        JPanel contentPane = new JPanel();
-        contentPane.setLayout(new BorderLayout());
-        fenetre.add(contentPane, BorderLayout.CENTER);
         fenetre.setVisible(true);
-
-        LevelUI levelUI = new LevelUI(level, fenetre.getWidth(),
-                fenetre.getHeight());
-        fenetre.addKeyListener(levelUI);
-
-        LevelEditorUI levelEditorUI = new LevelEditorUI(fenetre.getWidth(),
-                fenetre.getHeight());
-
-        fenetre.addMouseListener(levelEditorUI);
-        // contentPane.add(levelUI);
-        contentPane.add(levelEditorUI);
 
     }
 

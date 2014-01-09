@@ -47,7 +47,7 @@ public class LevelEditorUI extends JPanel implements MouseListener {
         this.setPreferredSize(new Dimension(width, height));
         this.setLayout(new BorderLayout());
         level = new Level();
-        levelUI = new LevelUI(level, width - 50, height);
+        levelUI = new LevelUI();
         listCaseTypeUI = new ListCaseTypeUI(45, height);
         this.add(levelUI, BorderLayout.CENTER);
         this.add(listCaseTypeUI, BorderLayout.EAST);
