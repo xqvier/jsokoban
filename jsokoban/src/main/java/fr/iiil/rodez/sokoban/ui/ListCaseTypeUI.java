@@ -4,7 +4,6 @@
  */
 package fr.iiil.rodez.sokoban.ui;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -25,23 +24,11 @@ public class ListCaseTypeUI extends JPanel {
     /** TODO comment field role */
     private static final long serialVersionUID = 1L;
 
-    private final int width;
-    private final int height;
-
-    private CaseType caseTypeSelected = null;
 
     /**
      * TODO comment initialization state
-     * 
-     * @param pWidth
-     *            largeur du panneau
-     * @param pHeight
-     *            hauteur du panneau
      */
-    public ListCaseTypeUI(int pWidth, int pHeight) {
-        width = pWidth;
-        height = pHeight;
-        this.setPreferredSize(new Dimension(width, height));
+    public ListCaseTypeUI() {
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
     }
 
@@ -52,18 +39,21 @@ public class ListCaseTypeUI extends JPanel {
      */
     @Override
     public void paint(Graphics g) {
+    	int width = getWidth();
+    	int height = getHeight();
+    	
         g.clearRect(0, 0, width, height);
         Graphics2D g2D = (Graphics2D) g;
         Case caze = new Case(CaseType.CHARACTER);
-        caze.paint(g2D, 0, 0, width, width);
+        caze.paint(g2D, 0, 0, width, width, true);
         caze = new Case(CaseType.EMPTY);
-        caze.paint(g2D, 0, 1, width, width);
+        caze.paint(g2D, 0, 1, width, width, true);
         caze = new Case(CaseType.HOLE);
-        caze.paint(g2D, 0, 2, width, width);
+        caze.paint(g2D, 0, 2, width, width, true);
         caze = new Case(CaseType.STONE);
-        caze.paint(g2D, 0, 3, width, width);
+        caze.paint(g2D, 0, 3, width, width, true);
         caze = new Case(CaseType.WALL);
-        caze.paint(g2D, 0, 4, width, width);
+        caze.paint(g2D, 0, 4, width, width, true);
     }
 
     /**
@@ -72,29 +62,35 @@ public class ListCaseTypeUI extends JPanel {
      * @param y
      *            TODO
      */
-    public void selectCase(int y) {
+    public CaseType selectCase(int y) {
+    	int width = getWidth();
+    	int pos = y / width;
+        CaseType caseTypeSelected = null;
 
-        if (y < width) {
+    	switch(pos){
+    	case 0:
             caseTypeSelected = CaseType.CHARACTER;
-        } else if (y < width * 2) {
+            break;
+    	case 1:
             caseTypeSelected = CaseType.EMPTY;
-        } else if (y < width * 3) {
+            break;
+    	case 2:
             caseTypeSelected = CaseType.HOLE;
-        } else if (y < width * 4) {
+            break;
+    	case 3:
             caseTypeSelected = CaseType.STONE;
-        } else if (y < width * 5) {
+            break;
+    	case 4:
             caseTypeSelected = CaseType.WALL;
-        } else {
+            break;
+    	default:
             caseTypeSelected = null;
+            break;
         }
+    	
+    	return caseTypeSelected;
 
     }
 
-    /**
-     * @return the caseTypeSelected
-     */
-    public CaseType getCaseTypeSelected() {
-        return caseTypeSelected;
-    }
 
 }

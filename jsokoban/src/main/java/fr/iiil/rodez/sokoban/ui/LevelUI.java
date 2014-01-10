@@ -9,7 +9,6 @@ import javax.swing.JPanel;
 
 import fr.iiil.rodez.sokoban.model.Case;
 import fr.iiil.rodez.sokoban.model.Level;
-import fr.iiil.rodez.sokoban.util.LevelEditor;
 
 /**
  * Classe d'interface Swing affichant un niveau de Sokoban et gérant les
@@ -38,7 +37,6 @@ public class LevelUI extends JPanel implements KeyListener {
      */
     public LevelUI(FenetreUI pFenetreUI) {
         fenetreUI = pFenetreUI;
-        level = LevelEditor.getLevel(1);
     }
 
     /**
@@ -60,7 +58,7 @@ public class LevelUI extends JPanel implements KeyListener {
             for (int j = 0; j < cases[0].length; j++) {
                 cases[i][j].paint(g2D, i, j, getWidth()
                         / level.getCases().length,
-                        getHeight() / level.getCases()[0].length);
+                        getHeight() / level.getCases()[0].length, false);
             }
         }
     }
