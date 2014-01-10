@@ -7,11 +7,13 @@ package fr.iiil.rodez.sokoban.ui;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import fr.iiil.rodez.sokoban.model.Level;
 import fr.iiil.rodez.sokoban.util.LevelEditor;
 
 /**
@@ -21,148 +23,170 @@ import fr.iiil.rodez.sokoban.util.LevelEditor;
  * 
  */
 public class MenuUI extends JPanel implements KeyListener {
-    /** TODO comment field role */
-    private static final long serialVersionUID = 1L;
+	/** TODO comment field role */
+	private static final long serialVersionUID = 1L;
 
-    private FenetreUI fenetre = null;
+	private FenetreUI fenetre = null;
 
-    private LevelUI levelUI = null;
+	private LevelUI levelUI = null;
 
-    private boolean victory = false;
+	private boolean victory = false;
 
-    private int levelSelected = 1;
+	private List<Level> levels = LevelEditor.getLevels();
 
-    /**
-     * TODO comment initialization state
-     */
-    public MenuUI() {
-        this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        levelSelected = 1;
-    }
+	public void setLevels(List<Level> levels) {
+		this.levels = levels;
+	}
 
-    /**
-     * TODO comment initialization state
-     * 
-     * @param pFenetre
-     *            TODO
-     * @param pLevelUI
-     *            TODO
-     * 
-     */
-    public MenuUI(FenetreUI pFenetre, LevelUI pLevelUI) {
-        this();
-        fenetre = pFenetre;
-        levelUI = pLevelUI;
-        this.setPreferredSize(new Dimension(800, 600));
-        this.setVisible(true);
-        repaint();
-        validate();
-    }
+	private int levelSelected = 0;
 
-    /**
-     * @param victory
-     *            the victory to set
-     */
-    public void setVictory(boolean victory) {
-        this.victory = victory;
-        if (victory) {
-            incrementLevel();
-        }
+	/**
+	 * TODO comment initialization state
+	 */
+	public MenuUI() {
+		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+	}
 
-    }
+	/**
+	 * TODO comment initialization state
+	 * 
+	 * @param pFenetre
+	 *            TODO
+	 * @param pLevelUI
+	 *            TODO
+	 * 
+	 */
+	public MenuUI(FenetreUI pFenetre, LevelUI pLevelUI) {
+		this();
+		fenetre = pFenetre;
+		levelUI = pLevelUI;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.Component#repaint()
-     */
-    @Override
-    public void repaint() {
-        this.removeAll();
-        if (victory) {
-            this.add(new JLabel("Victoire !"));
-        }
-        for (int i = 0; i < LevelEditor.NB_LEVEL; i++) {
-            JPanel textArea = new JPanel();
+		this.setPreferredSize(new Dimension(800, 600));
+		this.setVisible(true);
+		repaint();
+		validate();
+	}
 
-            if ((i + 1) == levelSelected) {
-                textArea.add(new JLabel("x"));
-            } else {
+	/**
+	 * @param victory
+	 *            the victory to set
+	 */
+	public void setVictory(boolean victory) {
+		this.victory = victory;
+		if (victory) {
+			incrementLevel();
+		}
 
-                textArea.add(new JLabel(" "));
-            }
-            textArea.add(new JLabel("Niveau " + (i + 1)));
+	}
 
-            this.add(textArea);
-        }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.Component#repaint()
+	 */
+	@Override
+	public void repaint() {
+		this.removeAll();
+		if (victory) {
+			this.add(new JLabel("Victoire !"));
+		}
+		JPanel textArea;
+		if (levels != null) {
+			for (int i = 0; i < levels.size(); i++) {
+				textArea = new JPanel();
 
-        this.validate();
+				if (i == levelSelected) {
+					textArea.add(new JLabel("x"));
+				} else {
 
-    }
+					textArea.add(new JLabel(" "));
+				}
+				textArea.add(new JLabel(levels.get(i).getName()));
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-     */
-    @Override
-    public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
+				this.add(textArea);
+			}
+			textArea = new JPanel();
+			if (levelSelected == levels.size()) {
+				textArea.add(new JLabel("x"));
+			} else {
+				textArea.add(new JLabel(" "));
+			}
+			textArea.add(new JLabel("Créer un niveau"));
+			this.add(textArea);
 
-    }
+		}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-     */
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            incrementLevel();
-            repaint();
-        } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-            decrementLevel();
-            repaint();
-        } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            levelUI.setLevel(LevelEditor.getLevel(levelSelected));
-            fenetre.hideMenu();
-        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            fenetre.hideMenu();
-        }
+		this.validate();
 
-    }
+	}
 
-    /**
-     * TODO comment role
-     */
-    private void decrementLevel() {
-        if (levelSelected == 1) {
-            levelSelected = LevelEditor.NB_LEVEL;
-        } else {
-            levelSelected--;
-        }
-    }
+	/**
+	 * TODO comment role
+	 */
+	private void decrementLevel() {
+		if (levelSelected == 0) {
+			levelSelected = levels.size();
+		} else {
+			levelSelected--;
+		}
+	}
 
-    /**
-     * TODO comment role
-     */
-    private void incrementLevel() {
-        if (levelSelected == LevelEditor.NB_LEVEL) {
-            levelSelected = 1;
-        } else {
-            levelSelected++;
-        }
-    }
+	/**
+	 * TODO comment role
+	 */
+	private void incrementLevel() {
+		if (levelSelected == levels.size()) {
+			levelSelected = 0;
+		} else {
+			levelSelected++;
+		}
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-     */
-    @Override
-    public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
 
-    }
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			incrementLevel();
+			repaint();
+		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
+			decrementLevel();
+			repaint();
+		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (levelSelected == levels.size()) {
+				fenetre.showLevelEditor();
+			} else {
+				levelUI.setLevel(levels.get(levelSelected));
+				fenetre.showLevel();
+			}
+		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			fenetre.showLevel();
+		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
 }
