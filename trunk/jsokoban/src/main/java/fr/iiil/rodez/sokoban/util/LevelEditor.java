@@ -23,21 +23,19 @@ public class LevelEditor {
 
 	private static final File levelDirectory = new File(System.getProperty("user.dir")); 
 	
+	public static final List<Level> LEVELS = new LinkedList<Level>();
 	
-	/**
-	 * TODO comment role
-	 * 
-	 * @param levelNumber
-	 *            Le numéro du niveau
-	 * @return Le niveau.
-	 */
-	public static List<Level> getLevels() {
-		List<Level> levels = new LinkedList<Level>();
+	static {initializeLevels();}
+	
+	public static void initializeLevels() {
+		if(LEVELS.size() != 0) {
+			LEVELS.clear();
+		}
 
-		levels.add(createLevel1());
-		levels.add(createLevel2());
-		levels.add(createLevel3());
-		levels.add(createLevel4());
+		LEVELS.add(createLevel1());
+		LEVELS.add(createLevel2());
+		LEVELS.add(createLevel3());
+		LEVELS.add(createLevel4());
 		
 		
 		for(File file : levelDirectory.listFiles()){
@@ -45,7 +43,7 @@ public class LevelEditor {
 				ObjectInputStream ois;
 				try {
 					ois = new ObjectInputStream(new FileInputStream(file));
-					levels.add((Level) ois.readObject());
+					LEVELS.add((Level) ois.readObject());
 					ois.close();
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -60,8 +58,6 @@ public class LevelEditor {
 				
 			}			
 		}
-
-		return levels;
 	}
 
 	/**
@@ -404,7 +400,6 @@ public class LevelEditor {
 
 	public static void saveLevel(Level level) {
 		File levelFile = new File(levelDirectory.getAbsolutePath() + File.separatorChar + level.getName() + ".lvl");
-		System.out.println(levelFile);
 		try {
 			levelFile.createNewFile();
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(levelFile));
@@ -415,6 +410,7 @@ public class LevelEditor {
 			e.printStackTrace();
 		}
 		
+		LEVELS.add(level);
 		
 	}
 }

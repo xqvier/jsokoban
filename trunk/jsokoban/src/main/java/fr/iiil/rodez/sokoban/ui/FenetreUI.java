@@ -33,7 +33,6 @@ public class FenetreUI extends JFrame {
 	public FenetreUI() {
 		this.setTitle("Sokoban");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		// this.setLayout(new BorderLayout());
 
 		this.setSize(800, 600);
 		contentPanel = new JPanel();
@@ -43,6 +42,7 @@ public class FenetreUI extends JFrame {
 		levelUI = new LevelUI(this);
 		levelUI.setPreferredSize(new Dimension(getWidth(), getHeight()));
 		menuUI = new MenuUI(this, levelUI);
+		setJMenuBar(new MenuBarUI(this, levelUI));
 
 		levelEditorUI = new LevelEditorUI(this);
 		levelEditorUI.setPreferredSize(new Dimension(getWidth(), getHeight()));
@@ -52,13 +52,18 @@ public class FenetreUI extends JFrame {
 
 	/**
 	 * TODO comment role
+	 * @param pReset TODO
 	 */
-	public void showLevel() {
+	public void showLevel(boolean pReset) {
+		this.removeKeyListener(levelUI);
 		this.removeKeyListener(menuUI);
 		levelEditorUI.removeMouseListener(levelEditorUI);
 		this.addKeyListener(levelUI);
 		contentPanel.removeAll();
 		contentPanel.add(levelUI, BorderLayout.CENTER);
+		if(pReset){
+			levelUI.setLevel(LevelEditor.LEVELS.get(menuUI.getSelectedLevel()));
+		}
 		levelUI.repaint();
 		validate();
 	}
@@ -70,13 +75,13 @@ public class FenetreUI extends JFrame {
 	 *            TODO
 	 */
 	public void showMenu(boolean pVictory) {
+		this.removeKeyListener(menuUI);
 		this.removeKeyListener(levelUI);
 		levelEditorUI.removeMouseListener(levelEditorUI);
 		this.addKeyListener(menuUI);
 		contentPanel.removeAll();
 		contentPanel.add(menuUI, BorderLayout.CENTER);		
 		menuUI.setVictory(pVictory);
-		menuUI.setLevels(LevelEditor.getLevels());
 		menuUI.repaint();
 		validate();
 
