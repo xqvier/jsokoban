@@ -5,7 +5,9 @@
 package fr.iiil.rodez.sokoban.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -14,9 +16,7 @@ import java.awt.event.MouseListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import fr.iiil.rodez.sokoban.model.Case;
 import fr.iiil.rodez.sokoban.model.CaseType;
@@ -34,8 +34,8 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 	/** TODO comment field role */
 	private static final long serialVersionUID = 1L;
 
-	private JTextField levelWidth = new JTextField("20");
-	private JTextField levelHeight = new JTextField("20");
+	private MarioTextField levelWidth = new MarioTextField("12");
+	private MarioTextField levelHeight = new MarioTextField("12");
 
 	private FenetreUI fenetreUI;
 
@@ -56,26 +56,49 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 	 */
 	public LevelEditorUI(FenetreUI pFenetreUI) {
 		fenetreUI = pFenetreUI;
+
 		this.setLayout(new BorderLayout());
-		JPanel textArea = new JPanel();
+		final JPanel textArea = new JPanel();
 		textArea.setLayout(new BoxLayout(textArea, BoxLayout.LINE_AXIS));
 
 		this.add(textArea, BorderLayout.NORTH);
 		textArea.setSize(new Dimension(getWidth(), 50));
 
-		textArea.add(new JLabel("Largeur"));
+		textArea.add(new MarioLabel("Largeur : "));
 		textArea.add(levelWidth);
-		textArea.add(new JLabel("Hauteur"));
+		textArea.add(new MarioLabel("Hauteur : "));
 		textArea.add(levelHeight);
 		JButton valid = new JButton();
+		final MarioLabel sizeCantBeLessOrEqualZero = new MarioLabel(" La hauteur ou la largeur ne peut être inférieur à 0");
+		
 		valid.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				showUI();
+				boolean inputCorrect = true;
+				int width = 0;
+				int height = 0;
+				try {
+					width = Integer.valueOf(levelWidth.getText());
+					height = Integer.valueOf(levelHeight.getText());
+				} catch (NumberFormatException ex) {
+					inputCorrect = false;
+				}
+
+				if (width <= 0 || height <= 0) {
+					inputCorrect = false;
+				}
+				if (inputCorrect) {
+					showUI();
+				} else {
+					textArea.remove(sizeCantBeLessOrEqualZero);
+					textArea.add(sizeCantBeLessOrEqualZero);
+					validate();
+					
+				}
 			}
 		});
-		valid.setText("Créer");
+		valid.add(new MarioLabel("Creer"));
 		textArea.add(valid);
 
 	}
@@ -92,43 +115,72 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 
 		listCaseTypeUI.setPreferredSize(new Dimension(listCaseTypeUIWidth,
 				getHeight()));
+		JPanel saveArea = new JPanel();
+		
 		JButton save = new JButton();
-		save.setText("Sauvegarder");
+		saveArea.setLayout(new GridLayout(1, 3));
+		save.add(new MarioLabel(" Sauvegarder !"));
+		saveArea.add(new JPanel());
+		saveArea.add(save);
+		saveArea.add(new JPanel());
 		save.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveLevel();
 			}
 		});
-		
+
 		this.add(levelUI, BorderLayout.CENTER);
 		this.add(listCaseTypeUI, BorderLayout.EAST);
-		this.add(save, BorderLayout.SOUTH);
+		this.add(saveArea, BorderLayout.SOUTH);
 		validate();
 	}
 
 	private void saveLevel() {
-		final JTextField name = new JTextField();
+		final MarioTextField name = new MarioTextField();
 		JButton valid = new JButton();
-		valid.setText("Créer");
+		valid.add(new MarioLabel("Creer"));
 		final JDialog dialog = new JDialog();
+		final MarioLabel nameAlreadyExistMessage = new MarioLabel(" Ce nom de niveau est déjà pris");
+		final MarioLabel nameCantBeEmptyMessage = new MarioLabel(" Le nom du niveau ne peut être vide");
 		valid.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				level.setName(name.getText());
-				LevelEditor.saveLevel(level);
-				dialog.setVisible(false);
-				fenetreUI.showMenu(false);
-				
+
+				if (!"".equals(name.getText())) {
+					boolean nameAlreadyExist = false;
+					for (Level level : LevelEditor.LEVELS) {
+						if (name.getText().equals(level.getName())) {
+							nameAlreadyExist = true;
+						}
+					}
+					if (!nameAlreadyExist) {
+						level.setName(name.getText());
+						LevelEditor.saveLevel(level);
+						dialog.setVisible(false);
+						fenetreUI.showMenu(false);
+					} else {
+						dialog.add(nameAlreadyExistMessage);
+						dialog.remove(nameCantBeEmptyMessage);
+						dialog.setSize(600, 70);
+						dialog.validate();
+					}
+				} else {
+					dialog.add(nameCantBeEmptyMessage);
+					dialog.remove(nameAlreadyExistMessage);
+					dialog.setSize(600, 70);
+					dialog.validate();
+				}
 
 			}
 		});
 
-		dialog.setSize(300, 70);
-		dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.LINE_AXIS));
-		dialog.add(new JLabel("Nom du niveau : "));
+		dialog.setSize(600, 70);
+		dialog.setLayout(new BoxLayout(dialog.getContentPane(),
+				BoxLayout.LINE_AXIS));
+		dialog.add(new MarioLabel("Nom du niveau : "));
 		dialog.add(name);
 		dialog.add(valid);
 		dialog.setVisible(true);
@@ -144,10 +196,11 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 		if (levelUI.getWidth() > 0) {
 			if (e.getX() > levelUI.getWidth()) {
 				selectedCaseType = listCaseTypeUI.selectCase(e.getY());
-				if(selectedCaseType != null){
-					this.setCursor(new Case(selectedCaseType).getCursor(getX(), getY()));
+				if (selectedCaseType != null) {
+					this.setCursor(new Case(selectedCaseType).getCursor(getX(),
+							getY()));
 				}
-				
+
 			} else {
 				if (selectedCaseType != null) {
 					int posX = (level.getWidthSize() * e.getX())
