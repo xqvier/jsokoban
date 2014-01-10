@@ -5,12 +5,10 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageInputStream;
 
 /**
  * Classe représentant une case du jeu Sokoban
@@ -31,16 +29,16 @@ public class Case implements Serializable {
 
 	static {
 		try {
-			CHARACTER_IMAGE = ImageIO.read(new FileImageInputStream(new File(
-					Case.class.getResource("/mario.jpg").getFile())));
-			HOLE_IMAGE = ImageIO.read(new FileImageInputStream(new File(
-					Case.class.getResource("/hole.jpg").getFile())));
-			WALL_IMAGE = ImageIO.read(new FileImageInputStream(new File(
-					Case.class.getResource("/wall.jpg").getFile())));
-			EMPTY_IMAGE = ImageIO.read(new FileImageInputStream(new File(
-					Case.class.getResource("/empty.jpg").getFile())));
-			STONE_IMAGE = ImageIO.read(new FileImageInputStream(new File(
-					Case.class.getResource("/stone.jpg").getFile())));
+			CHARACTER_IMAGE = ImageIO.read(ClassLoader
+					.getSystemResourceAsStream("mario.jpg"));
+			HOLE_IMAGE = ImageIO.read(ClassLoader
+					.getSystemResourceAsStream("hole.jpg"));
+			WALL_IMAGE = ImageIO.read(ClassLoader
+					.getSystemResourceAsStream("wall.jpg"));
+			EMPTY_IMAGE = ImageIO.read(ClassLoader
+					.getSystemResourceAsStream("empty.jpg"));
+			STONE_IMAGE = ImageIO.read(ClassLoader
+					.getSystemResourceAsStream("stone.jpg"));
 
 		} catch (IOException e) {
 			throw new RuntimeException("Image non trouvé", e);
