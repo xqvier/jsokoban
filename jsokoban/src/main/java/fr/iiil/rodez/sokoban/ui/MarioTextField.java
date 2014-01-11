@@ -28,22 +28,14 @@ public class MarioTextField extends JTextField {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		setSize(150, 50);
 	}
 
 	public MarioTextField() {
-		try {
-			Font marioFont = Font.createFont(Font.TRUETYPE_FONT,
-					MarioLabel.class.getResource("/SuperMario256.ttf")
-							.openStream());
-			marioFont = marioFont.deriveFont(Font.PLAIN, 18);
-			setFont(marioFont);
-
-		} catch (FontFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this("");
 	}
+	
+	
+	
 }
