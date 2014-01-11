@@ -12,9 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import fr.iiil.rodez.sokoban.model.Case;
@@ -33,10 +31,9 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 	/** TODO comment field role */
 	private static final long serialVersionUID = 1L;
 
-	private MarioTextField levelWidth = new MarioTextField("12");
-	private MarioTextField levelHeight = new MarioTextField("12");
-
 	private FenetreUI fenetreUI;
+
+	private LevelEditorCreateDialog dialog;
 
 	private Level level = new Level();
 	private LevelUI levelUI = new LevelUI(null);
@@ -55,67 +52,28 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 	 */
 	public LevelEditorUI(FenetreUI pFenetreUI) {
 		fenetreUI = pFenetreUI;
-
 		this.setLayout(new BorderLayout());
-		final JPanel textArea = new JPanel();
-		textArea.setLayout(new BoxLayout(textArea, BoxLayout.LINE_AXIS));
-
-		this.add(textArea, BorderLayout.NORTH);
-		textArea.setSize(new Dimension(getWidth(), 50));
-
-		textArea.add(new MarioLabel("Largeur : "));
-		textArea.add(levelWidth);
-		textArea.add(new MarioLabel("Hauteur : "));
-		textArea.add(levelHeight);
-		JButton valid = new JButton();
-		final MarioLabel sizeCantBeLessOrEqualZero = new MarioLabel(" La hauteur ou la largeur ne peut être inférieur à 0");
-		
-		valid.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean inputCorrect = true;
-				int width = 0;
-				int height = 0;
-				try {
-					width = Integer.valueOf(levelWidth.getText());
-					height = Integer.valueOf(levelHeight.getText());
-				} catch (NumberFormatException ex) {
-					inputCorrect = false;
-				}
-
-				if (width <= 0 || height <= 0) {
-					inputCorrect = false;
-				}
-				if (inputCorrect) {
-					showUI();
-				} else {
-					textArea.remove(sizeCantBeLessOrEqualZero);
-					textArea.add(sizeCantBeLessOrEqualZero);
-					validate();
-					
-				}
-			}
-		});
-		valid.add(new MarioLabel("Creer"));
-		textArea.add(valid);
 
 	}
 
-	private void showUI() {
+	public void launch() {
+		dialog = new LevelEditorCreateDialog(fenetreUI, this);
+	}
+
+	void showUI() {
 		this.setLayout(new BorderLayout());
 		this.removeAll();
-		level = new Level(Integer.valueOf(levelHeight.getText()),
-				Integer.valueOf(levelWidth.getText()));
+		level = new Level(dialog.getLevelHeight(), dialog.getLevelWidth());
+		level.setName(dialog.getLevelName());
 		levelUI.setLevel(level);
 
 		int listCaseTypeUIWidth = getWidth()
-				/ (Integer.valueOf(levelWidth.getText()) + 1);
+				/ (dialog.getLevelWidth() + 1);
 
 		listCaseTypeUI.setPreferredSize(new Dimension(listCaseTypeUIWidth,
 				getHeight()));
 		JPanel saveArea = new JPanel();
-		
+
 		JButton save = new JButton();
 		saveArea.setLayout(new GridLayout(1, 3));
 		save.add(new MarioLabel(" Sauvegarder !"));
@@ -137,52 +95,8 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 	}
 
 	private void saveLevel() {
-		final MarioTextField name = new MarioTextField();
-		JButton valid = new JButton();
-		valid.add(new MarioLabel("Creer"));
-		final JDialog dialog = new JDialog();
-		final MarioLabel nameAlreadyExistMessage = new MarioLabel(" Ce nom de niveau est déjà pris");
-		final MarioLabel nameCantBeEmptyMessage = new MarioLabel(" Le nom du niveau ne peut être vide");
-		valid.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				if (!"".equals(name.getText())) {
-					boolean nameAlreadyExist = false;
-					for (Level level : LevelEditor.LEVELS) {
-						if (name.getText().equals(level.getName())) {
-							nameAlreadyExist = true;
-						}
-					}
-					if (!nameAlreadyExist) {
-						level.setName(name.getText());
-						LevelEditor.saveLevel(level);
-						dialog.setVisible(false);
-						fenetreUI.showMenu(false);
-					} else {
-						dialog.add(nameAlreadyExistMessage);
-						dialog.remove(nameCantBeEmptyMessage);
-						dialog.setSize(600, 70);
-						dialog.validate();
-					}
-				} else {
-					dialog.add(nameCantBeEmptyMessage);
-					dialog.remove(nameAlreadyExistMessage);
-					dialog.setSize(600, 70);
-					dialog.validate();
-				}
-
-			}
-		});
-
-		dialog.setSize(600, 70);
-		dialog.setLayout(new BoxLayout(dialog.getContentPane(),
-				BoxLayout.LINE_AXIS));
-		dialog.add(new MarioLabel("Nom du niveau : "));
-		dialog.add(name);
-		dialog.add(valid);
-		dialog.setVisible(true);
+		LevelEditor.saveLevel(level);
+		fenetreUI.showMenu(false);
 	}
 
 	/*

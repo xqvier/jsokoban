@@ -93,7 +93,7 @@ public class FenetreUI extends JFrame {
 		levelEditorUI.addMouseListener(levelEditorUI);
 		contentPanel.removeAll();
 		contentPanel.add(levelEditorUI, BorderLayout.CENTER);
-		levelEditorUI.repaint();
+		levelEditorUI.launch();
 		validate();
 
 	}
