@@ -47,6 +47,7 @@ public class FenetreUI extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		this.setSize(800, 600);
+		this.setResizable(false);
 		contentPanel = new JPanel();
 		contentPanel.setLayout(new BorderLayout());
 		this.add(contentPanel, BorderLayout.CENTER);
@@ -126,8 +127,8 @@ public class FenetreUI extends JFrame {
 
 			textArea = new JPanel();
 			JButton valid = new JButton();
-			valid.add(new MarioLabel("Continuer"));
-			valid.addActionListener(new ActionListener() {
+			valid.add(new MarioLabel("Appuyez sur espace"));
+			valid.addActionListener(new ActionListener(){
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
