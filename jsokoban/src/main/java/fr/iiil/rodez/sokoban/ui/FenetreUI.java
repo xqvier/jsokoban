@@ -5,8 +5,20 @@
 package fr.iiil.rodez.sokoban.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -46,13 +58,15 @@ public class FenetreUI extends JFrame {
 
 		levelEditorUI = new LevelEditorUI(this);
 		levelEditorUI.setPreferredSize(new Dimension(getWidth(), getHeight()));
-		 showMenu(false);
-//		showLevelEditor();
+		showMenu(false);
+		// showLevelEditor();
 	}
 
 	/**
 	 * TODO comment role
-	 * @param pReset TODO
+	 * 
+	 * @param pReset
+	 *            TODO
 	 */
 	public void showLevel(boolean pReset) {
 		this.removeKeyListener(levelUI);
@@ -61,7 +75,7 @@ public class FenetreUI extends JFrame {
 		this.addKeyListener(levelUI);
 		contentPanel.removeAll();
 		contentPanel.add(levelUI, BorderLayout.CENTER);
-		if(pReset){
+		if (pReset) {
 			levelUI.setLevel(LevelEditor.LEVELS.get(menuUI.getSelectedLevel()));
 		}
 		levelUI.repaint();
@@ -80,10 +94,54 @@ public class FenetreUI extends JFrame {
 		levelEditorUI.removeMouseListener(levelEditorUI);
 		this.addKeyListener(menuUI);
 		contentPanel.removeAll();
-		contentPanel.add(menuUI, BorderLayout.CENTER);		
+		contentPanel.add(menuUI, BorderLayout.CENTER);
 		menuUI.setVictory(pVictory);
 		menuUI.repaint();
 		validate();
+
+		if (pVictory) {
+			Clip clip;
+			try {
+				clip = AudioSystem.getClip();
+				AudioInputStream inputStream = AudioSystem
+						.getAudioInputStream(ClassLoader
+								.getSystemResourceAsStream("wololo.wav"));
+				clip.open(inputStream);
+				clip.start();
+
+			} catch (LineUnavailableException e) {
+				throw new RuntimeException(e);
+			} catch (UnsupportedAudioFileException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			final JDialog victoryDialog = new JDialog();
+			JPanel textArea = new JPanel();
+			victoryDialog.setLayout(new BoxLayout(victoryDialog
+					.getContentPane(), BoxLayout.PAGE_AXIS));
+			victoryDialog.setSize(400, 120);
+			textArea.add(new MarioLabel("Victoire !", Color.BLUE));
+			victoryDialog.add(textArea);
+
+			textArea = new JPanel();
+			JButton valid = new JButton();
+			valid.add(new MarioLabel("Continuer"));
+			valid.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					victoryDialog.setVisible(false);
+
+				}
+			});
+			textArea.add(valid);
+			victoryDialog.add(textArea);
+
+			victoryDialog.setVisible(true);
+			victoryDialog.validate();
+			valid.transferFocus();
+		}
 
 	}
 
