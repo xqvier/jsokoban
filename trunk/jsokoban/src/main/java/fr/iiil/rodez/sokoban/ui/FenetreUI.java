@@ -128,7 +128,7 @@ public class FenetreUI extends JFrame {
 			textArea = new JPanel();
 			JButton valid = new JButton();
 			valid.add(new MarioLabel("Appuyez sur espace"));
-			valid.addActionListener(new ActionListener(){
+			valid.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -139,6 +139,9 @@ public class FenetreUI extends JFrame {
 			textArea.add(valid);
 			victoryDialog.add(textArea);
 
+			victoryDialog.setLocation(
+					(getWidth() - victoryDialog.getWidth()) / 2,
+					(getHeight() - victoryDialog.getHeight()) / 2);
 			victoryDialog.setVisible(true);
 			victoryDialog.validate();
 			valid.transferFocus();
