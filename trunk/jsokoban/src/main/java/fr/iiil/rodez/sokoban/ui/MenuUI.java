@@ -15,48 +15,62 @@ import javax.swing.JPanel;
 import fr.iiil.rodez.sokoban.util.LevelEditor;
 
 /**
- * TODO comment class responsabilities
+ * Classe d'interface du menu principale du jeu.
  * 
- * @author Administrateur
- * 
+ * @author Axel Lormeau
+ * @author Xavier Mourgues
  */
 public class MenuUI extends JPanel implements KeyListener {
-	/** TODO comment field role */
+	/** ID de sérialisation */
 	private static final long serialVersionUID = 1L;
 
+	/** Fenetre parente. */
 	private FenetreUI fenetre = null;
 
+	/** Interface de niveau */
 	private LevelUI levelUI = null;
 
+	/** Information pour savoir si le menu affiche victoire */
 	private boolean victory = false;
 
+	/** Le niveau selectionné dans le menu */
 	private int levelSelected = 0;
 
 	/**
-	 * TODO comment initialization state
+	 * Constructeur par défaut
 	 */
 	public MenuUI() {
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
+		setPreferredSize(new Dimension(800, 600));
+		setVisible(true);
+
+		repaint();
+		validate();
 	}
 
 	/**
-	 * TODO comment initialization state
+	 * Constructeur
 	 * 
 	 * @param pFenetre
-	 *            TODO
+	 *            fenetre parente
 	 * @param pLevelUI
-	 *            TODO
-	 * 
+	 *            interface de niveau
 	 */
 	public MenuUI(FenetreUI pFenetre, LevelUI pLevelUI) {
 		this();
 		fenetre = pFenetre;
 		levelUI = pLevelUI;
+	}
 
-		this.setPreferredSize(new Dimension(800, 600));
-		this.setVisible(true);
-		repaint();
-		validate();
+	/**
+	 * @return the levelSelected
+	 */
+	public int getLevelSelected() {
+		if (levelSelected == LevelEditor.LEVELS.size()) {
+			incrementLevel();
+		}
+		return levelSelected;
 	}
 
 	/**
@@ -71,47 +85,50 @@ public class MenuUI extends JPanel implements KeyListener {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.Component#repaint()
-	 */
 	@Override
 	public void repaint() {
-		this.removeAll();
-		if (getGraphics() != null) {
-			getGraphics().clearRect(0, 0, getWidth(), getHeight());
-		}
+		// Clean de l'interface
+		removeAll();
+
 		JPanel textArea;
+		// Ajout d'un texte de victoire.
 		if (victory) {
 			textArea = new JPanel();
 			textArea.add(new MarioLabel("Victoire !", Color.BLUE));
-			this.add(textArea);
+			add(textArea);
 		}
+
+		// Si les niveaux ont été intialisés.
 		if (LevelEditor.LEVELS != null) {
+			// Affichage des niveaux disponibles
 			for (int i = 0; i < LevelEditor.LEVELS.size(); i++) {
 				textArea = new JPanel();
 				if (i == levelSelected) {
+					// Distinction pour le niveau selectionné
 					textArea.add(new MarioLabel("x"));
 				}
 				textArea.add(new MarioLabel(
 						LevelEditor.LEVELS.get(i).getName(), Color.RED));
-
-				this.add(textArea);
+				add(textArea);
 			}
+
+			// Ajout d'un menu pour créer un niveau.
 			textArea = new JPanel();
 			if (levelSelected == LevelEditor.LEVELS.size()) {
 				textArea.add(new MarioLabel("x"));
 			}
 			textArea.add(new MarioLabel("Creer un niveau"));
-			this.add(textArea);
+			add(textArea);
 		}
-		this.validate();
+
+		// Rafraichissement de l'interface
+		validate();
 
 	}
 
 	/**
-	 * TODO comment role
+	 * Méthode pour décrémenter le niveau selectionné (si le niveau était 0 on
+	 * repart à la fin de la liste).
 	 */
 	private void decrementLevel() {
 		if (levelSelected == 0) {
@@ -122,7 +139,8 @@ public class MenuUI extends JPanel implements KeyListener {
 	}
 
 	/**
-	 * TODO comment role
+	 * Méthode pour incrémenter le niveau selectionné (si le niveau était
+	 * "création de niveau" on repart au début de la liste).
 	 */
 	private void incrementLevel() {
 		if (levelSelected == LevelEditor.LEVELS.size()) {
@@ -132,59 +150,48 @@ public class MenuUI extends JPanel implements KeyListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-	 */
 	@Override
+	@Deprecated
 	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
+		// Non utilisé
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
+		System.out.println("key pressed");
+
+		// Navigation dans le menu.
 		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			incrementLevel();
 			repaint();
 		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 			decrementLevel();
 			repaint();
-		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+		}
+		// Selection d'une entrée du menu.
+		else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			// Si création de niveau on affiche l'éditeur
 			if (levelSelected == LevelEditor.LEVELS.size()) {
 				fenetre.showLevelEditor();
-			} else {
+			}
+			// Sinon on affiche le niveau selectionné
+			else {
 				levelUI.setLevel(LevelEditor.LEVELS.get(levelSelected));
 				fenetre.showLevel(false);
 			}
-		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		}
+		// Sortie du menu vers le niveau précedement joué, pas de reset
+		// effectué.
+		else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			fenetre.showLevel(false);
 		}
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-	 */
 	@Override
+	@Deprecated
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-
+		// Non utilisé
 	}
 
-	public int getSelectedLevel() {
-		if (levelSelected == LevelEditor.LEVELS.size()) {
-			incrementLevel();
-		}
-		return levelSelected;
-
-	}
 }

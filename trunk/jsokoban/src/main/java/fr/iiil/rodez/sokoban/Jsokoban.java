@@ -9,23 +9,22 @@ import fr.iiil.rodez.sokoban.ui.FenetreUI;
  * 
  * @author Axel Lormeau
  * @author Xavier Mourgues
- * 
  */
 public class Jsokoban {
 
-    /**
-     * Point d'entrée de lancement du jeu Sokoban
-     * 
-     * @param args
-     *            liste des arguments passé au programme
-     */
-    public static void main(String[] args) {
+	/**
+	 * Point d'entrée de lancement du jeu Sokoban
+	 * 
+	 * @param args
+	 *            liste des arguments passé au programme
+	 */
+	public static void main(String[] args) {
 
-        // Fenetre
-        JFrame fenetre = new FenetreUI();
+		// Fenetre
+		JFrame fenetre = new FenetreUI();
 
-        fenetre.setVisible(true);
+		fenetre.setVisible(true);
 
-    }
+	}
 
 }

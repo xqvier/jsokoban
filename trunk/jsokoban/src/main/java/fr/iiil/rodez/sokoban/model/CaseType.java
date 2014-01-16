@@ -1,7 +1,8 @@
 package fr.iiil.rodez.sokoban.model;
 
 /**
- * Enumération de type de case
+ * Enumération de type de case.
+ * 
  * @author Axel Lormeau
  * @author Xavier Mourgues
  */
@@ -20,5 +21,5 @@ public enum CaseType {
 	FILLED_HOLE,
 	/** Type de case personnage sur trou */
 	CHARACTER_ON_HOLE;
-	
+
 }
