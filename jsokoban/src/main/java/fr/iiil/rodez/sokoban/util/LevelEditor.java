@@ -17,46 +17,56 @@ import fr.iiil.rodez.sokoban.model.Level;
  * 
  * @author Axel Lormeau
  * @author Xavier Mourgues
- * 
  */
 public class LevelEditor {
 
-	private static final File levelDirectory = new File(System.getProperty("user.dir")); 
-	
+	/**
+	 * Répertoire où sont stocker les niveaux (répertoire où se situe le
+	 * programme).
+	 */
+	private static final File levelDirectory = new File(
+			System.getProperty("user.dir"));
+
+	/** Liste des niveaux de l'application */
 	public static final List<Level> LEVELS = new LinkedList<Level>();
-	
-	static {initializeLevels();}
-	
+
+	static {
+		initializeLevels();
+	}
+
+	/**
+	 * Initialise les niveaux du jeu.<br />
+	 * Ajoute d'abord les niveaux programmé en dur.<br />
+	 * Ajoute ensuite les niveaux créés par l'utilisateur.
+	 */
 	public static void initializeLevels() {
-		if(LEVELS.size() != 0) {
+		// Vidage de la liste.
+		if (LEVELS.size() != 0) {
 			LEVELS.clear();
 		}
 
+		// Ajout des niveaux programmés en dur.
 		LEVELS.add(createLevel1());
 		LEVELS.add(createLevel2());
 		LEVELS.add(createLevel3());
 		LEVELS.add(createLevel4());
-		
-		
-		for(File file : levelDirectory.listFiles()){
-			if(file.isFile() && file.getName().endsWith(".lvl")){
+
+		// Scan du répertoire des niveaux pour ajout dans la liste.
+		for (File file : levelDirectory.listFiles()) {
+			if (file.isFile() && file.getName().endsWith(".lvl")) {
 				ObjectInputStream ois;
 				try {
 					ois = new ObjectInputStream(new FileInputStream(file));
 					LEVELS.add((Level) ois.readObject());
 					ois.close();
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new RuntimeException(e);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new RuntimeException(e);
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
-				
-			}			
+			}
 		}
 	}
 
@@ -96,6 +106,11 @@ public class LevelEditor {
 		return level;
 	}
 
+	/**
+	 * Céation du niveau 2 du jeu Sokoban
+	 * 
+	 * @return Le niveau crée
+	 */
 	private static Level createLevel2() {
 		Level level = new Level(12, 12, 5, 1);
 
@@ -207,6 +222,11 @@ public class LevelEditor {
 		return level;
 	}
 
+	/**
+	 * Céation du niveau 3 du jeu Sokoban
+	 * 
+	 * @return Le niveau crée
+	 */
 	private static Level createLevel3() {
 		Level level = new Level(10, 10, 3, 6);
 
@@ -252,6 +272,11 @@ public class LevelEditor {
 		return level;
 	}
 
+	/**
+	 * Céation du niveau 4 du jeu Sokoban
+	 * 
+	 * @return Le niveau crée
+	 */
 	private static Level createLevel4() {
 		Level level = new Level(16, 19, 2, 7);
 
@@ -398,19 +423,30 @@ public class LevelEditor {
 		return level;
 	}
 
+	/**
+	 * Méthode de sauvegarde d'un niveau.<br />
+	 * crée un fichier NOM.lvl dans le répertoire des niveaux.<br />
+	 * Sauvegarde par sérialisation le niveau.
+	 * 
+	 * @param level
+	 *            le niveau à sauvegarder.
+	 */
 	public static void saveLevel(Level level) {
-		File levelFile = new File(levelDirectory.getAbsolutePath() + File.separatorChar + level.getName() + ".lvl");
+		// Création du fichier
+		File levelFile = new File(levelDirectory.getAbsolutePath()
+				+ File.separatorChar + level.getName() + ".lvl");
 		try {
 			levelFile.createNewFile();
-			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(levelFile));
+			// Sérialisation du niveau dans le fichier.
+			ObjectOutputStream oos = new ObjectOutputStream(
+					new FileOutputStream(levelFile));
 			oos.writeObject(level);
 			oos.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		
+
+		// Ajout du niveau à la liste.
 		LEVELS.add(level);
-		
 	}
 }

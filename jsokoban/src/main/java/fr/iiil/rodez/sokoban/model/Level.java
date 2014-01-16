@@ -7,23 +7,27 @@ import java.io.Serializable;
  * 
  * @author Axel Lormeau
  * @author Xavier Mourgues
- * 
  */
 public class Level implements Serializable {
-	/**
-	 * 
-	 */
+	/** ID de sérialisation */
 	private static final long serialVersionUID = 1L;
 
+	/** Nom du niveau */
 	private String name;
 
 	/** Matrice des cases du niveau */
 	private final Case[][] cases;
 
-	/** Position abscisse du personnage dans le niveau */
+	/**
+	 * Position abscisse du personnage dans le niveau (sauvegarde pour permettre
+	 * des opération plus rapide)
+	 */
 	private int characterPosX;
 
-	/** Position ordonné du personnage dans le niveau */
+	/**
+	 * Position ordonné du personnage dans le niveau (sauvegarde pour permettre
+	 * des opération plus rapide)
+	 */
 	private int characterPosY;
 
 	/**
@@ -69,14 +73,22 @@ public class Level implements Serializable {
 	 * Constructeur de création d'un niveau de 20 cases par 20 cases avec le
 	 * personnage initialement positionné en position 0, 0
 	 */
-	public Level() {
-		this(20, 20, 0, 0);
-	}
+	// XXX XMO
+	// public Level() {
+	// this(20, 20, 0, 0);
+	// }
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @param name
+	 *            the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -89,29 +101,65 @@ public class Level implements Serializable {
 	}
 
 	/**
-	 * TODO comment role
+	 * Retourne la taille en largeur du niveau (en nombre de cases)
 	 * 
-	 * @return TODO
+	 * @return La largeur du niveau
 	 */
 	public int getWidthSize() {
 		return cases.length;
 	}
 
 	/**
-	 * TODO comment role
+	 * Retourne la taille en hauteur du niveau (en nombre de cases)
 	 * 
-	 * @return TODO
+	 * @return La hauteur du niveau
 	 */
 	public int getHeightSize() {
 		return cases[0].length;
 	}
 
 	/**
-	 * Initialise le niveau avec uniquement des cases vides.
+	 * Positionne un personnage suivant ses coordonnées.
+	 * 
+	 * @param pPosX
+	 *            position en abscisse
+	 * @param pPosY
+	 *            position en ordonné
+	 */
+	public void setCharacter(int pPosX, int pPosY) {
+		// Vérification des limites
+		checkBoundaries(pPosX, pPosY);
+
+		// On restore la case où été situé le personnage (suivant s'il était sur
+		// une case vide ou sur un trou).
+		if (cases[characterPosX][characterPosY].getType().equals(
+				CaseType.CHARACTER_ON_HOLE)) {
+			cases[characterPosX][characterPosY].setType(CaseType.HOLE);
+		} else {
+			cases[characterPosX][characterPosY].setType(CaseType.EMPTY);
+		}
+
+		// Positionnement du personnage.
+		characterPosX = pPosX;
+		characterPosY = pPosY;
+		// Conditionnement suivant s'il existe un trou à l'endroit ou l'on veut
+		// positionner le personnage.
+		if (cases[pPosX][pPosY].getType().equals(CaseType.HOLE)) {
+			cases[pPosX][pPosY].setType(CaseType.CHARACTER_ON_HOLE);
+		} else {
+			cases[pPosX][pPosY].setType(CaseType.CHARACTER);
+		}
+	}
+
+	/**
+	 * Initialise le niveau avec uniquement des cases vides.<br />
+	 * Laisse la case personnage telle quelle.
 	 */
 	private void initializeEmptiness() {
 		for (int i = 0; i < cases.length; i++) {
 			for (int j = 0; j < cases[0].length; j++) {
+				// Attribution du type EMPTY a toutes les cases sauf celle ou le
+				// personnage est situé
 				if (i != characterPosX || j != characterPosY) {
 					cases[i][j] = new Case(CaseType.EMPTY);
 				}
@@ -131,32 +179,6 @@ public class Level implements Serializable {
 		if (pPosX < 0 || pPosX >= cases.length || pPosY < 0
 				|| pPosY >= cases[0].length) {
 			throw new ArrayIndexOutOfBoundsException();
-		}
-	}
-
-	/**
-	 * TODO comment role
-	 * 
-	 * @param pPosX
-	 *            position en abscisse
-	 * @param pPosY
-	 *            position en ordonné
-	 */
-	public void setCharacter(int pPosX, int pPosY) {
-		checkBoundaries(pPosX, pPosY);
-		if (cases[characterPosX][characterPosY].getType().equals(
-				CaseType.CHARACTER_ON_HOLE)) {
-			cases[characterPosX][characterPosY].setType(CaseType.HOLE);
-		} else {
-			cases[characterPosX][characterPosY].setType(CaseType.EMPTY);
-		}
-		characterPosX = pPosX;
-		characterPosY = pPosY;
-		if (cases[pPosX][pPosY].getType().equals(CaseType.HOLE)) {
-
-			cases[pPosX][pPosY].setType(CaseType.CHARACTER_ON_HOLE);
-		} else {
-			cases[pPosX][pPosY].setType(CaseType.CHARACTER);
 		}
 	}
 
@@ -235,11 +257,16 @@ public class Level implements Serializable {
 	 * Déplace le personnage à droite après avoir gérer les collisions
 	 */
 	public void moveEast() {
+		// Si le mouvement est possible.
 		if (checkMoveEast()) {
+			// Si la case où l'on veut aller est occupé par une pierre, on
+			// déplace d'abord la pierre.
 			if (cases[characterPosX + 1][characterPosY].getType().equals(
 					CaseType.STONE)
 					|| cases[characterPosX + 1][characterPosY].getType()
 							.equals(CaseType.FILLED_HOLE)) {
+				// Positionnement de la pierre en fonction de s'il existe un
+				// trou ou non à la position voulue.
 				if (cases[characterPosX + 2][characterPosY].getType().equals(
 						CaseType.HOLE)) {
 					cases[characterPosX + 2][characterPosY]
@@ -249,6 +276,9 @@ public class Level implements Serializable {
 							.setType(CaseType.STONE);
 				}
 			}
+
+			// Positionnement du personnage en fonction de s'il existe un trou
+			// ou non à la position voulue.
 			if (cases[characterPosX + 1][characterPosY].getType().equals(
 					CaseType.HOLE)
 					|| cases[characterPosX + 1][characterPosY].getType()
@@ -260,6 +290,8 @@ public class Level implements Serializable {
 						.setType(CaseType.CHARACTER);
 			}
 
+			// On restore la case où été situé le personnage (suivant s'il était
+			// sur une case vide ou sur un trou).
 			if (cases[characterPosX][characterPosY].getType().equals(
 					CaseType.CHARACTER_ON_HOLE)) {
 				cases[characterPosX][characterPosY].setType(CaseType.HOLE);
@@ -267,6 +299,7 @@ public class Level implements Serializable {
 				cases[characterPosX][characterPosY].setType(CaseType.EMPTY);
 			}
 
+			// Mise à jour de la position du personnage sauvegardé.
 			characterPosX++;
 
 		}
@@ -276,11 +309,16 @@ public class Level implements Serializable {
 	 * Déplace le personnage à gauche après avoir gérer les collisions
 	 */
 	public void moveWest() {
+		// Si le mouvement est possible.
 		if (checkMoveWest()) {
+			// Si la case où l'on veut aller est occupé par une pierre, on
+			// déplace d'abord la pierre.
 			if (cases[characterPosX - 1][characterPosY].getType().equals(
 					CaseType.STONE)
 					|| cases[characterPosX - 1][characterPosY].getType()
 							.equals(CaseType.FILLED_HOLE)) {
+				// Positionnement de la pierre en fonction de s'il existe un
+				// trou ou non à la position voulue.
 				if (cases[characterPosX - 2][characterPosY].getType().equals(
 						CaseType.HOLE)) {
 					cases[characterPosX - 2][characterPosY]
@@ -290,6 +328,9 @@ public class Level implements Serializable {
 							.setType(CaseType.STONE);
 				}
 			}
+
+			// Positionnement du personnage en fonction de s'il existe un trou
+			// ou non à la position voulue.
 			if (cases[characterPosX - 1][characterPosY].getType().equals(
 					CaseType.HOLE)
 					|| cases[characterPosX - 1][characterPosY].getType()
@@ -301,6 +342,8 @@ public class Level implements Serializable {
 						.setType(CaseType.CHARACTER);
 			}
 
+			// On restore la case où été situé le personnage (suivant s'il était
+			// sur une case vide ou sur un trou).
 			if (cases[characterPosX][characterPosY].getType().equals(
 					CaseType.CHARACTER_ON_HOLE)) {
 				cases[characterPosX][characterPosY].setType(CaseType.HOLE);
@@ -308,6 +351,7 @@ public class Level implements Serializable {
 				cases[characterPosX][characterPosY].setType(CaseType.EMPTY);
 			}
 
+			// Mise à jour de la position du personnage sauvegardé.
 			characterPosX--;
 		}
 	}
@@ -316,11 +360,16 @@ public class Level implements Serializable {
 	 * Déplace le personnage en bas après avoir gérer les collisions
 	 */
 	public void moveSouth() {
+		// Si le mouvement est possible.
 		if (checkMoveSouth()) {
+			// Si la case où l'on veut aller est occupé par une pierre, on
+			// déplace d'abord la pierre.
 			if (cases[characterPosX][characterPosY + 1].getType().equals(
 					CaseType.STONE)
 					|| cases[characterPosX][characterPosY + 1].getType()
 							.equals(CaseType.FILLED_HOLE)) {
+				// Positionnement de la pierre en fonction de s'il existe un
+				// trou ou non à la position voulue.
 				if (cases[characterPosX][characterPosY + 2].getType().equals(
 						CaseType.HOLE)) {
 					cases[characterPosX][characterPosY + 2]
@@ -330,6 +379,9 @@ public class Level implements Serializable {
 							.setType(CaseType.STONE);
 				}
 			}
+
+			// Positionnement du personnage en fonction de s'il existe un trou
+			// ou non à la position voulue.
 			if (cases[characterPosX][characterPosY + 1].getType().equals(
 					CaseType.HOLE)
 					|| cases[characterPosX][characterPosY + 1].getType()
@@ -341,12 +393,16 @@ public class Level implements Serializable {
 						.setType(CaseType.CHARACTER);
 			}
 
+			// On restore la case où été situé le personnage (suivant s'il était
+			// sur une case vide ou sur un trou).
 			if (cases[characterPosX][characterPosY].getType().equals(
 					CaseType.CHARACTER_ON_HOLE)) {
 				cases[characterPosX][characterPosY].setType(CaseType.HOLE);
 			} else {
 				cases[characterPosX][characterPosY].setType(CaseType.EMPTY);
 			}
+
+			// Mise à jour de la position du personnage sauvegardé.
 			characterPosY++;
 		}
 	}
@@ -355,11 +411,16 @@ public class Level implements Serializable {
 	 * Déplace le personnage en haut après avoir gérer les collisions
 	 */
 	public void moveNorth() {
+		// Si le mouvement est possible.
 		if (checkMoveNorth()) {
+			// Si la case où l'on veut aller est occupé par une pierre, on
+			// déplace d'abord la pierre.
 			if (cases[characterPosX][characterPosY - 1].getType().equals(
 					CaseType.STONE)
 					|| cases[characterPosX][characterPosY - 1].getType()
 							.equals(CaseType.FILLED_HOLE)) {
+				// Positionnement de la pierre en fonction de s'il existe un
+				// trou ou non à la position voulue.
 				if (cases[characterPosX][characterPosY - 2].getType().equals(
 						CaseType.HOLE)) {
 					cases[characterPosX][characterPosY - 2]
@@ -369,6 +430,9 @@ public class Level implements Serializable {
 							.setType(CaseType.STONE);
 				}
 			}
+
+			// Positionnement du personnage en fonction de s'il existe un trou
+			// ou non à la position voulue.
 			if (cases[characterPosX][characterPosY - 1].getType().equals(
 					CaseType.HOLE)
 					|| cases[characterPosX][characterPosY - 1].getType()
@@ -380,12 +444,16 @@ public class Level implements Serializable {
 						.setType(CaseType.CHARACTER);
 			}
 
+			// On restore la case où été situé le personnage (suivant s'il était
+			// sur une case vide ou sur un trou).
 			if (cases[characterPosX][characterPosY].getType().equals(
 					CaseType.CHARACTER_ON_HOLE)) {
 				cases[characterPosX][characterPosY].setType(CaseType.HOLE);
 			} else {
 				cases[characterPosX][characterPosY].setType(CaseType.EMPTY);
 			}
+
+			// Mise à jour de la position du personnage sauvegardé.
 			characterPosY--;
 		}
 	}
@@ -402,22 +470,26 @@ public class Level implements Serializable {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
 		}
+
 		// Vérification qu'il n'y ai pas de mur
 		if (cases[characterPosX + 1][characterPosY].getType().equals(
 				CaseType.WALL)) {
 			return false;
 		}
+
 		// Existance pierre ?
 		if (cases[characterPosX + 1][characterPosY].getType().equals(
 				CaseType.STONE)
 				|| cases[characterPosX + 1][characterPosY].getType().equals(
 						CaseType.FILLED_HOLE)) {
-			// On verifie qu'elle va pas etre en dehors du tableau
+			// On verifie que la pierre ne va pas être déplacer en dehors des
+			// limites du tableau.
 			try {
 				checkBoundaries(characterPosX + 2, characterPosY);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				return false;
 			}
+
 			// On vérifie qu'il n'y ai pas une autre pierre ou un mur derriere.
 			if (cases[characterPosX + 2][characterPosY].getType().equals(
 					CaseType.WALL)
@@ -428,6 +500,8 @@ public class Level implements Serializable {
 				return false;
 			}
 		}
+
+		// Tous les tests OK.
 		return true;
 	}
 
@@ -437,24 +511,33 @@ public class Level implements Serializable {
 	 * @return true si le déplacement est possible, false sinon
 	 */
 	private boolean checkMoveWest() {
+		// Verification qu'on est dans les limites du tableau
 		try {
 			checkBoundaries(characterPosX - 1, characterPosY);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
 		}
+
+		// Vérification qu'il n'y ai pas de mur
 		if (cases[characterPosX - 1][characterPosY].getType().equals(
 				CaseType.WALL)) {
 			return false;
 		}
+
+		// Existance pierre ?
 		if (cases[characterPosX - 1][characterPosY].getType().equals(
 				CaseType.STONE)
 				|| cases[characterPosX - 1][characterPosY].getType().equals(
 						CaseType.FILLED_HOLE)) {
+			// On verifie que la pierre ne va pas être déplacer en dehors des
+			// limites du tableau.
 			try {
 				checkBoundaries(characterPosX - 2, characterPosY);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				return false;
 			}
+
+			// On vérifie qu'il n'y ai pas une autre pierre ou un mur derriere.
 			if (cases[characterPosX - 2][characterPosY].getType().equals(
 					CaseType.WALL)
 					|| cases[characterPosX - 2][characterPosY].getType()
@@ -464,6 +547,8 @@ public class Level implements Serializable {
 				return false;
 			}
 		}
+
+		// Tous les tests OK.
 		return true;
 	}
 
@@ -473,24 +558,33 @@ public class Level implements Serializable {
 	 * @return true si le déplacement est possible, false sinon
 	 */
 	private boolean checkMoveSouth() {
+		// Verification qu'on est dans les limites du tableau
 		try {
 			checkBoundaries(characterPosX, characterPosY + 1);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
 		}
+
+		// Vérification qu'il n'y ai pas de mur
 		if (cases[characterPosX][characterPosY + 1].getType().equals(
 				CaseType.WALL)) {
 			return false;
 		}
+
+		// Existance pierre ?
 		if (cases[characterPosX][characterPosY + 1].getType().equals(
 				CaseType.STONE)
 				|| cases[characterPosX][characterPosY + 1].getType().equals(
 						CaseType.FILLED_HOLE)) {
+			// On verifie que la pierre ne va pas être déplacer en dehors des
+			// limites du tableau.
 			try {
 				checkBoundaries(characterPosX, characterPosY + 2);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				return false;
 			}
+
+			// On vérifie qu'il n'y ai pas une autre pierre ou un mur derriere.
 			if (cases[characterPosX][characterPosY + 2].getType().equals(
 					CaseType.WALL)
 					|| cases[characterPosX][characterPosY + 2].getType()
@@ -500,6 +594,8 @@ public class Level implements Serializable {
 				return false;
 			}
 		}
+
+		// Tous les tests OK.
 		return true;
 	}
 
@@ -509,24 +605,33 @@ public class Level implements Serializable {
 	 * @return true si le déplacement est possible, false sinon
 	 */
 	private boolean checkMoveNorth() {
+		// Verification qu'on est dans les limites du tableau
 		try {
 			checkBoundaries(characterPosX, characterPosY - 1);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
 		}
+
+		// Vérification qu'il n'y ai pas de mur
 		if (cases[characterPosX][characterPosY - 1].getType().equals(
 				CaseType.WALL)) {
 			return false;
 		}
+
+		// Existance pierre ?
 		if (cases[characterPosX][characterPosY - 1].getType().equals(
 				CaseType.STONE)
 				|| cases[characterPosX][characterPosY - 1].getType().equals(
 						CaseType.FILLED_HOLE)) {
+			// On verifie que la pierre ne va pas être déplacer en dehors des
+			// limites du tableau.
 			try {
 				checkBoundaries(characterPosX, characterPosY - 2);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				return false;
 			}
+
+			// On vérifie qu'il n'y ai pas une autre pierre ou un mur derriere.
 			if (cases[characterPosX][characterPosY - 2].getType().equals(
 					CaseType.WALL)
 					|| cases[characterPosX][characterPosY - 2].getType()
@@ -536,6 +641,8 @@ public class Level implements Serializable {
 				return false;
 			}
 		}
+
+		// Tous les tests OK.
 		return true;
 	}
 
@@ -547,6 +654,8 @@ public class Level implements Serializable {
 	public boolean checkVictory() {
 		for (int i = 0; i < cases.length; i++) {
 			for (int j = 0; j < cases[0].length; j++) {
+				// On regarde s'il existe un trou libre ou si le personnage est
+				// sur un trou.
 				if (cases[i][j].getType().equals(CaseType.HOLE)
 						|| cases[i][j].getType().equals(
 								CaseType.CHARACTER_ON_HOLE)) {
@@ -554,11 +663,14 @@ public class Level implements Serializable {
 				}
 			}
 		}
+
+		// Tous les trous sont pris par des pierres
 		return true;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		// Le niveau est le même s'il a le même nom.
 		return name.equals(((Level) obj).getName());
 	}
 

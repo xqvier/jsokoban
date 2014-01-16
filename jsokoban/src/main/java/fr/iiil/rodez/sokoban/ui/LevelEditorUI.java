@@ -21,59 +21,79 @@ import fr.iiil.rodez.sokoban.model.Level;
 import fr.iiil.rodez.sokoban.util.LevelEditor;
 
 /**
- * TODO comment class responsabilities
+ * Classe d'interface d'affichage de l'édition de niveau.<br />
+ * Cette interface inclut l'interface d'affichage de niveau classique, sans la
+ * capture des touches du clavier.<br />
+ * Elle rajoute sur l'interface une "liste" des cases disponibles pour
+ * séléction.
  * 
- * @author Administrateur
- * 
+ * @author Axel Lormeau
+ * @author Xavier Mourgues
  */
 public class LevelEditorUI extends JPanel implements MouseListener {
 
-	/** TODO comment field role */
+	/** ID de serialisation */
 	private static final long serialVersionUID = 1L;
 
-	private FenetreUI fenetreUI;
+	/** Interface de la fenetre contenant ce panneau */
+	private final FenetreUI fenetreUI;
 
+	/** Popup de configuration du niveau */
 	private LevelEditorCreateDialog dialog;
 
-	private Level level = new Level();
-	private LevelUI levelUI = new LevelUI(null);
+	/** Le niveau en cours de création */
+	private Level level;
 
-	private ListCaseTypeUI listCaseTypeUI = new ListCaseTypeUI();
+	/** Interface d'affichage du niveau */
+	private final LevelUI levelUI = new LevelUI(null);
 
+	/** Interface d'affichage de la liste des cases disponibles */
+	private final ListCaseTypeUI listCaseTypeUI = new ListCaseTypeUI();
+
+	/** Le type de case selectionné pour ajout sur le niveau */
 	private CaseType selectedCaseType;
 
 	/**
-	 * TODO comment initialization state
+	 * Constructeur par défaut
 	 * 
-	 * @param pWidth
-	 *            largeur du panneau
-	 * @param pHeight
-	 *            hauteur du panneau
+	 * @param pFenetreUI
+	 *            Fenetre parente du panneau pour ordonné un basculement.
 	 */
 	public LevelEditorUI(FenetreUI pFenetreUI) {
+		// Initialisation de l'interface
 		fenetreUI = pFenetreUI;
 		this.setLayout(new BorderLayout());
-
 	}
 
+	/**
+	 * Méthode de lancement de l'interface. Celle-ci commence par afficher
+	 * l'interface de configuration
+	 */
 	public void launch() {
+		// Affichage de la popup de configuration.
 		dialog = new LevelEditorCreateDialog(fenetreUI, this);
 	}
 
+	/**
+	 * Méthode d'affichage de l'interface en fonction de la configuration
+	 * saisie.
+	 */
 	void showUI() {
-		this.setLayout(new BorderLayout());
+		// Clean de l'interface
 		this.removeAll();
+
+		// Création du niveau en fonction de la configuration saisie.
 		level = new Level(dialog.getLevelHeight(), dialog.getLevelWidth());
 		level.setName(dialog.getLevelName());
 		levelUI.setLevel(level);
 
-		int listCaseTypeUIWidth = getWidth()
-				/ (dialog.getLevelWidth() + 1);
-
+		// Calcul de la largeur de l'interface de sélection des cases.
+		int listCaseTypeUIWidth = getWidth() / (dialog.getLevelWidth() + 1);
 		listCaseTypeUI.setPreferredSize(new Dimension(listCaseTypeUIWidth,
 				getHeight()));
-		JPanel saveArea = new JPanel();
 
+		// Création d'un bouton de sauvegarde.
+		JPanel saveArea = new JPanel();
 		JButton save = new JButton();
 		saveArea.setLayout(new GridLayout(1, 3));
 		save.add(new MarioLabel(" Sauvegarder !"));
@@ -81,46 +101,62 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 		saveArea.add(save);
 		saveArea.add(new JPanel());
 		save.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveLevel();
 			}
 		});
 
+		// Ajout de l'interface de niveau, de selection de case à l'interface
+		// d'édition et du bouton de sauvegarde.
 		this.add(levelUI, BorderLayout.CENTER);
 		this.add(listCaseTypeUI, BorderLayout.EAST);
 		this.add(saveArea, BorderLayout.SOUTH);
+
+		// Rafraichisement de l'interface
 		validate();
 	}
 
+	/**
+	 * Méthode de sauvegarde du niveau créé.
+	 */
 	private void saveLevel() {
+		// Sauvegarde du niveau
 		LevelEditor.saveLevel(level);
+
+		// Affichage du menu
 		fenetreUI.showMenu(false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		// Si l'interface à été initialisé.
 		if (levelUI.getWidth() > 0) {
+			// Si on a cliqué sur la liste des cases disponible
 			if (e.getX() > levelUI.getWidth()) {
+				// Récupération de la case selectionnée.
 				selectedCaseType = listCaseTypeUI.selectCase(e.getY());
+				// Si une case à été selectionnée.
 				if (selectedCaseType != null) {
+					// Remplacement du curseur par celui correspondant à la case
+					// selectionnée.
 					this.setCursor(new Case(selectedCaseType).getCursor(getX(),
 							getY()));
 				}
 
-			} else {
+			} // Sinon, on a cliqué sur le niveau (pour ajout de la case
+				// selectionnée).
+			else {
+				// Si une case a été selectionnée.
 				if (selectedCaseType != null) {
+					// Récupération de la position du clique à l'échelle de la
+					// matrice du niveau.
 					int posX = (level.getWidthSize() * e.getX())
 							/ levelUI.getWidth();
 					int posY = (level.getHeightSize() * e.getY())
 							/ levelUI.getHeight();
 
+					// Ajout de la case au niveau en fonction de son type.
 					switch (selectedCaseType) {
 					case CHARACTER:
 						level.setCharacter(posX, posY);
@@ -141,58 +177,36 @@ public class LevelEditorUI extends JPanel implements MouseListener {
 					default:
 						break;
 					}
-					levelUI.repaint();
-
 				}
-
 			}
 		}
-
+		// Raffraichissement de l'interface.
+		repaint();
+		validate();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
 	@Override
+	@Deprecated
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+		// Non utilisé
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-	 */
 	@Override
+	@Deprecated
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+		// Non utilisé
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-	 */
 	@Override
+	@Deprecated
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+		// Non utilisé
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-	 */
 	@Override
+	@Deprecated
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+		// Non utilisé
 	}
 
 }
